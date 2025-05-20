@@ -22,6 +22,12 @@
 > *Paper at [arXiv 2503.16591](https://arxiv.org/pdf/2503.16591.pdf)*
 
 
+## TEMPORARY CODE REMOVAL
+
+The code will be **TEMPORARY** removed due to Patent / License change from my PhD sponsor side.
+For any inquiry about the code, particularly from people already using the codebase, you can contact me at lpiccinelli@ethz.ch , please use "UniK3D codebase" as email object.
+
+
 ## News and ToDo
 
 - [ ] Rays to parameters optimization.
@@ -263,10 +269,10 @@ If you find any bug in the code, please report to Luigi Piccinelli (lpiccinelli@
 
 If you find our work useful in your research please consider citing our publications:
 ```bibtex
-@inproceedings{piccinelli2025unik3d,
+@article{piccinelli2025unik3d,
     title     = {{U}ni{K3D}: Universal Camera Monocular 3D Estimation},
     author    = {Piccinelli, Luigi and Sakaridis, Christos and Segu, Mattia and Yang, Yung-Hsu and Li, Siyuan and Abbeloos, Wim and Van Gool, Luc},
-    booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    journal   = {arXiv preprint arXiv:2503.16591},
     year      = {2025}
 }
 ```
