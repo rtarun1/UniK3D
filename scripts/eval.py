@@ -1,25 +1,23 @@
-import os
 import argparse
+import datetime
 import json
+import os
 import random
 from functools import partial
-import datetime 
 
 import numpy as np
-
 import torch
-import torch.utils.data.distributed
 import torch.nn as nn
+import torch.utils.data.distributed
 from torch import distributed as dist
 from torch.nn import functional as F
 from torch.nn.parallel.distributed import DistributedDataParallel
 from torch.utils.data import DataLoader, SequentialSampler
 
-
 import unik3d.datasets as datasets
-from unik3d.datasets import (DistributedSamplerNoDuplicate, collate_fn)
+from unik3d.datasets import DistributedSamplerNoDuplicate, collate_fn
 from unik3d.models import UniK3D
-from unik3d.utils import (is_main_process, validate)
+from unik3d.utils import is_main_process, validate
 from unik3d.utils.distributed import (create_local_process_group,
                                       local_broadcast_process_authkey,
                                       setup_multi_processes, setup_slurm)
@@ -27,11 +25,14 @@ from unik3d.utils.distributed import (create_local_process_group,
 
 def main_worker(args: argparse.Namespace, config_file: str | None = None):
     with open(config_file, "r") as f:
-        if is_main_process(): print("Config: ", config_file)
+        if is_main_process():
+            print("Config: ", config_file)
         config = json.load(f)
 
     if not args.distributed:
-        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+        device = (
+            torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        )
         args.rank = 0
         args.world_size = 1
     else:
@@ -45,7 +46,12 @@ def main_worker(args: argparse.Namespace, config_file: str | None = None):
         args.local_rank = device = int(os.environ["LOCAL_RANK"])
         device = args.local_rank
         if not is_slurm:
-            dist.init_process_group(backend="nccl", rank=args.rank, world_size=args.world_size, timeout=datetime.timedelta(seconds=30*60))
+            dist.init_process_group(
+                backend="nccl",
+                rank=args.rank,
+                world_size=args.world_size,
+                timeout=datetime.timedelta(seconds=30 * 60),
+            )
             torch.cuda.set_device(device)
         create_local_process_group()
         local_broadcast_process_authkey()
@@ -66,17 +72,22 @@ def main_worker(args: argparse.Namespace, config_file: str | None = None):
     print(f"MODEL: {model.__class__.__name__} at {model.device}")
     torch.cuda.empty_cache()
     model = model.to(device)
-    
+
     if args.distributed:
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
         if any([p.requires_grad for p in model.parameters()]) and device != "cpu":
-            model = DistributedDataParallel(model, find_unused_parameters=False, device_ids=[device], output_device=device)
+            model = DistributedDataParallel(
+                model,
+                find_unused_parameters=False,
+                device_ids=[device],
+                output_device=device,
+            )
 
     ##############################
     ########## DATASET ###########
     ##############################
     # Datasets loading
-    resize_method = config["data"].get("resize_method", "hard") 
+    resize_method = config["data"].get("resize_method", "hard")
     crop = config["data"].get("crop", "garg")
     augmentations_db = config["data"].get("augmentations", {})
     image_shape = config["data"]["image_shape"]
@@ -102,9 +113,18 @@ def main_worker(args: argparse.Namespace, config_file: str | None = None):
 
     # Dataset samplers, create distributed sampler pinned to rank
     if args.distributed:
-        valid_samplers = {k: DistributedSamplerNoDuplicate(v, num_replicas=args.world_size, rank=args.rank, shuffle=False, drop_last=False) for k,v in val_datasets.items()}
+        valid_samplers = {
+            k: DistributedSamplerNoDuplicate(
+                v,
+                num_replicas=args.world_size,
+                rank=args.rank,
+                shuffle=False,
+                drop_last=False,
+            )
+            for k, v in val_datasets.items()
+        }
     else:
-        valid_samplers = {k: SequentialSampler(v) for k,v in val_datasets.items()}
+        valid_samplers = {k: SequentialSampler(v) for k, v in val_datasets.items()}
 
     # Dataset loader
     val_batch_size = 1
@@ -118,17 +138,22 @@ def main_worker(args: argparse.Namespace, config_file: str | None = None):
             sampler=valid_samplers[name_dataset],
             pin_memory=True,
             drop_last=False,
-            collate_fn=partial(collate_fn, is_batched=False)
-        ) for name_dataset, dataset in val_datasets.items()
+            collate_fn=partial(collate_fn, is_batched=False),
+        )
+        for name_dataset, dataset in val_datasets.items()
     }
-    
+
     is_shell = int(os.environ.get("SHELL_JOB", "0"))
-    if is_main_process(): 
+    if is_main_process():
         print("shell job?", is_shell)
-    context = torch.autocast(device_type="cuda" if device != "cpu" else "cpu", enabled=True, dtype=torch.float16)
+    context = torch.autocast(
+        device_type="cuda" if device != "cpu" else "cpu",
+        enabled=True,
+        dtype=torch.float16,
+    )
 
     model.eval()
-    if is_main_process(): 
+    if is_main_process():
         print("Start validation...")
     with torch.no_grad():
         stats = validate(
@@ -139,22 +164,23 @@ def main_worker(args: argparse.Namespace, config_file: str | None = None):
             context=context,
             idxs=[0],
         )
-    
-    stats = {k: v for k,v in stats.items() if k in config["data"]["val_datasets"]}
+
+    stats = {k: v for k, v in stats.items() if k in config["data"]["val_datasets"]}
     if is_main_process():
         with open(args.save_path, "w") as f:
             json.dump(stats, f, indent=4)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Arguments
-    parser = argparse.ArgumentParser(description='Training script', conflict_handler='resolve')
+    parser = argparse.ArgumentParser(
+        description="Training script", conflict_handler="resolve"
+    )
     parser.add_argument("--master-port", type=str, default=29400)
-    parser.add_argument("--distributed",  action="store_true")
-    parser.add_argument("--local_rank",  type=int, default=0)
+    parser.add_argument("--distributed", action="store_true")
+    parser.add_argument("--local_rank", type=int, default=0)
     parser.add_argument("--config-file", type=str, default="./configs/eval/vitl.json")
-    parser.add_argument("--camera-gt",  action="store_true")
+    parser.add_argument("--camera-gt", action="store_true")
     parser.add_argument("--save-path", type=str, default="./unik3d.json")
     parser.add_argument("--dataroot", type=str, required=True)
 
@@ -170,4 +196,3 @@ if __name__ == '__main__':
     torch.backends.cudnn.deterministic = False
     torch.backends.cudnn.benchmark = True
     stats = main_worker(args, args.config_file)
-

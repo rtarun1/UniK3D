@@ -581,7 +581,9 @@ def squeeze_list(nested_list, dim, current_dim=0):
         return nested_list
 
 
-def match_gt(tensor1, tensor2, padding1, padding2, mode: str = "bilinear", padding1_mode="output"):
+def match_gt(
+    tensor1, tensor2, padding1, padding2, mode: str = "bilinear", padding1_mode="output"
+):
     """
     Transform each item in tensor1 batch to match tensor2's dimensions and padding.
 
@@ -627,13 +629,14 @@ def match_gt(tensor1, tensor2, padding1, padding2, mode: str = "bilinear", paddi
                 item2.shape[2] - pad2_l - pad2_r + pad1_l + pad1_r,
             )
 
-
         item1_resized = F.interpolate(
             item1_unpadded.unsqueeze(0).to(tgt_dtype), size=(h2, w2), mode=mode
         )
         if padding1_mode == "output":
             h1_new, w1_new = item1_resized.shape[-2:]
-            item1_unpadded = item1[..., pad1_t : h1_new - pad1_b, pad1_l : w1_new - pad1_r]
+            item1_unpadded = item1[
+                ..., pad1_t : h1_new - pad1_b, pad1_l : w1_new - pad1_r
+            ]
         item1_padded = F.pad(item1_resized, (pad2_l, pad2_r, pad2_t, pad2_b))
         transformed_tensors.append(item1_padded)
 

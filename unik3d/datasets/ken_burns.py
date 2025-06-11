@@ -56,7 +56,7 @@ class KenBurns(ImageDataset):
         txt_string = txt_file.tostring().decode("ascii").strip("\n")
         intrinsics = np.array(h5file[self.intrisics_file]).tostring().decode("ascii")
         intrinsics = json.loads(intrinsics)
-        
+
         dataset = []
         for line in txt_string.split("\n"):
             image_filename, depth_filename, chunk_idx = line.strip().split(" ")

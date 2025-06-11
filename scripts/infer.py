@@ -54,20 +54,58 @@ def infer(model, args):
 
     outputs = model.infer(rgb=rgb_torch, camera=camera, normalize=True, rays=None)
     name = args.input.split("/")[-1].split(".")[0]
-    save(rgb_torch, outputs, name=name, base_path=args.output, save_map=args.save, save_pointcloud=args.save_ply)
+    save(
+        rgb_torch,
+        outputs,
+        name=name,
+        base_path=args.output,
+        save_map=args.save,
+        save_pointcloud=args.save_ply,
+    )
 
 
 if __name__ == "__main__":
     # Arguments
-    parser = argparse.ArgumentParser(description='Training script', conflict_handler='resolve')
+    parser = argparse.ArgumentParser(
+        description="Training script", conflict_handler="resolve"
+    )
     parser.add_argument("--input", type=str, required=True, help="Path to input image.")
-    parser.add_argument("--output", type=str, required=True, help="Path to output directory.")
-    parser.add_argument("--config-file", type=str, required=True, default="./configs/eval/vitl.json", help="Path to config file. Please check ./configs/eval.")
-    parser.add_argument("--camera-path", type=str, default=None, help="Path to camera parameters json file. See assets/demo for a few examples. The file needs a 'name' field with the camera model from unik3d/utils/camera.py and a 'params' field with the camera parameters as in the corresponding class docstring.")
-    parser.add_argument("--save", action="store_true", help="Save outputs as (colorized) png.")
-    parser.add_argument("--save-ply", action="store_true", help="Save pointcloud as ply.")
-    parser.add_argument("--resolution-level", type=int, default=9, help="Resolution level in [0,10). Higher values means it will resize to larger resolution which increases details but decreases speed. Lower values lead to opposite.", choices=list(range(10)))
-    parser.add_argument("--interpolation-mode", type=str, default="bilinear", help="Output interpolation.", choices=["nearest", "nearest-exact", "bilinear"])
+    parser.add_argument(
+        "--output", type=str, required=True, help="Path to output directory."
+    )
+    parser.add_argument(
+        "--config-file",
+        type=str,
+        required=True,
+        default="./configs/eval/vitl.json",
+        help="Path to config file. Please check ./configs/eval.",
+    )
+    parser.add_argument(
+        "--camera-path",
+        type=str,
+        default=None,
+        help="Path to camera parameters json file. See assets/demo for a few examples. The file needs a 'name' field with the camera model from unik3d/utils/camera.py and a 'params' field with the camera parameters as in the corresponding class docstring.",
+    )
+    parser.add_argument(
+        "--save", action="store_true", help="Save outputs as (colorized) png."
+    )
+    parser.add_argument(
+        "--save-ply", action="store_true", help="Save pointcloud as ply."
+    )
+    parser.add_argument(
+        "--resolution-level",
+        type=int,
+        default=9,
+        help="Resolution level in [0,10). Higher values means it will resize to larger resolution which increases details but decreases speed. Lower values lead to opposite.",
+        choices=list(range(10)),
+    )
+    parser.add_argument(
+        "--interpolation-mode",
+        type=str,
+        default="bilinear",
+        help="Output interpolation.",
+        choices=["nearest", "nearest-exact", "bilinear"],
+    )
     args = parser.parse_args()
 
     print("Torch version:", torch.__version__)
