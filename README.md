@@ -22,16 +22,9 @@
 > *Paper at [arXiv 2503.16591](https://arxiv.org/pdf/2503.16591.pdf)*
 
 
-## TEMPORARY CODE REMOVAL
-
-The code will be **TEMPORARY** removed due to Patent / License change from my PhD sponsor side.
-For any inquiry about the code, particularly from people already using the codebase, you can contact me at lpiccinelli@ethz.ch , please use "UniK3D codebase" as email object.
-
-
 ## News and ToDo
 
 - [ ] Rays to parameters optimization.
-- [ ] Release all evaluation dataset on HuggingFace (nuScenes and ScanNet++ missing).
 - [x] `21.03.2025`: Gradio demo and [Huggingface Demo](https://huggingface.co/spaces/lpiccinelli/UniK3D-demo).
 - [x] `20.03.2025`: Training and inference code released.
 - [x] `19.03.2025`: Models released.
@@ -269,10 +262,10 @@ If you find any bug in the code, please report to Luigi Piccinelli (lpiccinelli@
 
 If you find our work useful in your research please consider citing our publications:
 ```bibtex
-@article{piccinelli2025unik3d,
+@inproceedings{piccinelli2025unik3d,
     title     = {{U}ni{K3D}: Universal Camera Monocular 3D Estimation},
     author    = {Piccinelli, Luigi and Sakaridis, Christos and Segu, Mattia and Yang, Yung-Hsu and Li, Siyuan and Abbeloos, Wim and Van Gool, Luc},
-    journal   = {arXiv preprint arXiv:2503.16591},
+    booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
     year      = {2025}
 }
 ```

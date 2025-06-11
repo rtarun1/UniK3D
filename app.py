@@ -1,6 +1,6 @@
 """
 Author: Luigi Piccinelli
-Licensed under the CC-BY NC 4.0 license (http://creativecommons.org/licenses/by-nc/4.0/)
+Licensed under the CC BY-NC-SA 4.0 license (http://creativecommons.org/licenses/by-nc-sa/4.0/)
 """
 
 import gc
@@ -131,7 +131,7 @@ def gradio_demo(
     hfov,
     mask_black_bg,
     mask_far_points,
-    efficiency
+    efficiency,
 ):
     if not os.path.isdir(target_dir) or target_dir == "None":
         return None, "No valid target directory found. Please upload first.", None
@@ -431,7 +431,14 @@ if __name__ == "__main__":
                     label="Filter Black Background", value=False
                 )
                 mask_far_points = gr.Checkbox(label="Filter Far Points", value=False)
-                efficiency = gr.Slider(0, 10, step=1, value=10, label="Speed-Resolution Tradeoff", info="Lower is faster and Higher is more detailed")
+                efficiency = gr.Slider(
+                    0,
+                    10,
+                    step=1,
+                    value=10,
+                    label="Speed-Resolution Tradeoff",
+                    info="Lower is faster and Higher is more detailed",
+                )
 
             with gr.Column():
                 fx = gr.Number(label="Focal length x", value=500.0, visible=False)
@@ -695,7 +702,7 @@ if __name__ == "__main__":
             hfov,
             mask_black_bg,
             mask_far_points,
-            efficiency
+            efficiency,
         ):
             target_dir, image_path = handle_uploads(input_image)
             glbfile, log_msg, prediction_save_path = gradio_demo(
@@ -717,7 +724,7 @@ if __name__ == "__main__":
                 hfov,
                 mask_black_bg,
                 mask_far_points,
-                efficiency
+                efficiency,
             )
             return (
                 glbfile,
@@ -750,7 +757,7 @@ if __name__ == "__main__":
                 hfov,
                 mask_black_bg,
                 mask_far_points,
-                efficiency
+                efficiency,
             ],
             outputs=[reconstruction_output, log_output, reconstruction_npy],
             fn=example_pipeline,
@@ -781,7 +788,7 @@ if __name__ == "__main__":
                 hfov,
                 mask_black_bg,
                 mask_far_points,
-                efficiency
+                efficiency,
             ],
             outputs=[reconstruction_output, log_output, reconstruction_npy],
         ).then(

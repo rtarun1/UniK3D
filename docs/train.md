@@ -1,6 +1,7 @@
 ## Training
 
-We provide the `train.py` script that allows to load the dataset, initialize and start the training.
+Due to current licensing limitation, training code is available only after a request via email to `wim.abbeloos@toyota-europe.com` and cc me at `lpiccinelli@ethz.ch`
+<!-- We provide the `train.py` script that allows to load the dataset, initialize and start the training. -->
 
 ### Data preparation
 
