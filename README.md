@@ -127,7 +127,7 @@ rays = predictions["rays"]
 depth = predictions["depth"]
 ```
 
-You can use ground truth camera parameters or rays as input to the model as well:
+You can use ground truth camera parameters or rays as input to the model as well (be sure to run in `eval` mode):
 ```python
 from unik3d.utils.camera import (Pinhole, OPENCV, Fisheye624, MEI, Spherical)
 
@@ -138,6 +138,7 @@ with open(camera_path, "r") as f:
 params = torch.tensor(camera_dict["params"])
 name = camera_dict["name"]
 camera = eval(name)(params=params)
+model.eval() # IMPORTANT: if not eval model, it will ignore input rays.
 predictions = model.infer(rgb, camera)
 ```
 
